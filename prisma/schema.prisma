@@ -10,21 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  name String?
-  email String @unique
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String?
+  email    String  @unique
   password String
-  posts Post[]
+  posts    Post[]
 }
 
 model Post {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  slug String
-  title String
-  body String
-  ratings Float
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  slug     String
+  title    String
+  body     String
+  ratings  Float
   author   User   @relation(fields: [authorId], references: [id])
   authorId String @db.ObjectId
 }

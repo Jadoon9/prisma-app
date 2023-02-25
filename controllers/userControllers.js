@@ -37,12 +37,13 @@ export const signUp = async (req, res) => {
     return res.status(400).json({ error });
   }
 };
-//* User Sign Up
+
+//* User Sign In
 export const signIn = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
     // * Check
-    if ((!name, !email, !password)) {
+    if ((!email, !password)) {
       throw new Error("please provide all fields");
     }
 
@@ -52,21 +53,16 @@ export const signIn = async (req, res) => {
       },
     });
 
+    console.log(userCheck, "check");
+
     if (!userCheck) {
       throw new Error("No user found with this email");
     } else {
-      const foundUser = await prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
-
-      const checkPassword = await bcrypt.compare(password, foundUser.password);
+      const checkPassword = await bcrypt.compare(password, userCheck.password);
 
       if (checkPassword) {
-        const user = await prisma.user.create({
+        const user = await prisma.user.findFirst({
           data: {
-            name,
             email,
             password,
           },

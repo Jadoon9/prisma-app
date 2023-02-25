@@ -2,7 +2,7 @@ import prisma from "../prisma/index.js";
 import { ObjectId } from "bson";
 
 //* Get All Posts
-export const getPosts = async (req, res, next) => {
+export const getPosts = async (req, res) => {
   try {
     const allPosts = await prisma.post.findMany();
     return res.status(200).json({ allPosts });
@@ -11,8 +11,23 @@ export const getPosts = async (req, res, next) => {
   }
 };
 
+//* Get Single Post
+export const getPost = async (req, res) => {
+  const id = req.params.id
+  try {
+    const postData = await prisma.post.findFirst({
+      where: {
+        id
+      }
+    });
+    return res.status(200).json({ postData });
+  } catch {
+    return res.status(404).json({ error: "Not Found" });
+  }
+};
+
 //* Create Post
-export const createPost = async (req, res, next) => {
+export const createPost = async (req, res) => {
   const { id, slug, title, body, author, authorId, ratings } = req.body;
   try {
     const postData = await prisma.post.create({
@@ -39,7 +54,8 @@ export const createPost = async (req, res, next) => {
 
 //* Update Post
 export const updatePost = async (req, res) => {
-  const { id, slug, title, body, author, authorId, ratings } = req.body;
+  const id = req.params.id
+  const { slug, title, body, author, authorId, ratings } = req.body;
   try {
     const postData = await prisma.post.update({
       where: {
