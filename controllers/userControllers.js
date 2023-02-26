@@ -39,7 +39,7 @@ export const signUp = async (req, res) => {
 };
 
 //* User Sign In
-export const signIn = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     // * Check
@@ -47,33 +47,36 @@ export const signIn = async (req, res) => {
       throw new Error("please provide all fields");
     }
 
-    const userCheck = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         email,
       },
     });
 
-    console.log(userCheck, "check");
-
-    if (!userCheck) {
+    if (!user) {
       throw new Error("No user found with this email");
+    }
+    const checkPassword = await bcrypt.compare(password, user.password);
+    if (checkPassword) {
+      cookieToken(user, res);
     } else {
-      const checkPassword = await bcrypt.compare(password, userCheck.password);
-
-      if (checkPassword) {
-        const user = await prisma.user.findFirst({
-          data: {
-            email,
-            password,
-          },
-        });
-        cookieToken(user, res);
-      } else {
-        throw new Error("Credentials not matched");
-      }
+      throw new Error("Credentials not matched");
     }
   } catch (error) {
     console.log(error);
     return res.status(400).json({ error: error });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: "Somenthing went wrong",
+    });
   }
 };

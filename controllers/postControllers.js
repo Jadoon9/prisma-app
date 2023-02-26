@@ -13,12 +13,12 @@ export const getPosts = async (req, res) => {
 
 //* Get Single Post
 export const getPost = async (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
   try {
     const postData = await prisma.post.findFirst({
       where: {
-        id
-      }
+        id,
+      },
     });
     return res.status(200).json({ postData });
   } catch {
@@ -28,11 +28,10 @@ export const getPost = async (req, res) => {
 
 //* Create Post
 export const createPost = async (req, res) => {
-  const { id, slug, title, body, author, authorId, ratings } = req.body;
+  const { slug, title, body, authorId, ratings } = req.body;
   try {
     const postData = await prisma.post.create({
       data: {
-        // id: new ObjectId(),
         slug,
         title,
         body,
@@ -54,8 +53,8 @@ export const createPost = async (req, res) => {
 
 //* Update Post
 export const updatePost = async (req, res) => {
-  const id = req.params.id
-  const { slug, title, body, author, authorId, ratings } = req.body;
+  const id = req.params.id;
+  const { slug, title, body, ratings } = req.body;
   try {
     const postData = await prisma.post.update({
       where: {
@@ -71,13 +70,15 @@ export const updatePost = async (req, res) => {
 
     return res.status(200).json({ postData });
   } catch (error) {
-    return res.status(404).json({ error: error });
+    return res
+      .status(404)
+      .json({ error: "Counld not find the mentioned post" });
   }
 };
 
 //* Update Post
 export const deletePost = async (req, res) => {
-  const id  = req.params.id;
+  const id = req.params.id;
   try {
     await prisma.post.delete({
       where: {
@@ -91,15 +92,15 @@ export const deletePost = async (req, res) => {
   }
 };
 
-//* Delete All Posts
-export const deleteAllPosts = async (req, res) => {
-  try {
-    const deletedAllPosts = await prisma.post.deleteMany({});
+// //* Delete a Post
+// export const deleteAllPosts = async (req, res) => {
+//   try {
+//     const deletedAllPosts = await prisma.post.deleteMany({});
 
-    return res
-      .status(200)
-      .json({ success: "deleted All Record", data: { deletedAllPosts } });
-  } catch (error) {
-    return res.status(400).json({ error: error });
-  }
-};
+//     return res
+//       .status(200)
+//       .json({ success: "deleted All Record", data: { deletedAllPosts } });
+//   } catch (error) {
+//     return res.status(400).json({ error: error });
+//   }
+// };
