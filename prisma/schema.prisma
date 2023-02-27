@@ -6,24 +6,91 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  name     String?
-  email    String  @unique
-  password String
-  posts    Post[]
+  id        String    @id @default(uuid())
+  name      String?
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  isActive  Boolean?
+  Trip      Trip[]
+  friends   Friend[]
+
+  @@index([email])
 }
 
-model Post {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  slug     String
-  title    String
-  body     String
-  ratings  Float
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String @db.ObjectId
+model Friend {
+  id        String    @id @default(uuid())
+  image     String
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  isActive  Boolean?
+  User      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@index([name])
+}
+
+model Trip {
+  id          String    @id @default(uuid())
+  destination Place[]
+  startDate   DateTime  @default(now())
+  endDate     DateTime
+  duration    Int
+  preferences String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  isActive    Boolean?
+  traveler    User      @relation(fields: [travelerId], references: [id])
+  travelerId  String
+
+  @@index([preferences])
+}
+
+model ChatGpt {
+  id        String    @id @default(uuid())
+  choices   String[]
+  createdAt DateTime
+  updatedAt DateTime? @updatedAt
+  isActive  Boolean?
+}
+
+model Place {
+  id        String    @id @default(uuid())
+  name      String
+  location  String
+  ratings   Float
+  openTime  DateTime
+  closeTime DateTime
+  isOpen    Boolean
+  website   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  isActive  Boolean?
+  Trip      Trip?     @relation(fields: [tripId], references: [id])
+  tripId    String?
+  reviews   Review[]
+
+  @@index([name, location])
+}
+
+model Review {
+  id            String    @id @default(uuid())
+  reviewerImage String
+  name          String
+  ratings       Boolean
+  images        String[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime? @updatedAt
+  isActive      Boolean?
+  Place         Place?    @relation(fields: [placeId], references: [id])
+  placeId       String?
+
+  @@index([name])
 }
