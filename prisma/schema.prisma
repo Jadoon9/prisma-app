@@ -92,7 +92,7 @@ model Review {
   name          String
   ratings       Boolean   @default(false)
   comment       String
-  images        String[]
+  images        Image[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime? @updatedAt
   isActive      Boolean?  @default(false)
@@ -102,4 +102,15 @@ model Review {
   userId        String?
 
   @@index([name])
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  altText   String?
+  caption   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  review    Review?  @relation(fields: [reviewId], references: [id])
+  reviewId  String?
 }
