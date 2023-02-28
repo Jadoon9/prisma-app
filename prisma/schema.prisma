@@ -52,6 +52,7 @@ model Friend {
 
 model Trip {
   id          String    @id @default(uuid())
+  slug        String?
   destination Place[]
   startDate   DateTime  @default(now())
   endDate     DateTime
@@ -60,9 +61,8 @@ model Trip {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   isActive    Boolean?  @default(false)
-
-  traveler   Profile? @relation(fields: [travelerId], references: [id])
-  travelerId String?
+  traveler    Profile?  @relation(fields: [travelerId], references: [id])
+  travelerId  String?
 
   @@index([preferences])
 }
@@ -116,7 +116,7 @@ model Review {
   id            String    @id @default(uuid())
   reviewerImage String
   name          String
-  ratings       Float
+  ratings       Float?
   comment       String
   images        Image[]
   createdAt     DateTime  @default(now())

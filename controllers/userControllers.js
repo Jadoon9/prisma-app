@@ -1,5 +1,4 @@
 import prisma from "../prisma/index.js";
-import cookieToken from "../utils/cookiesToken.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
