@@ -1,13 +1,16 @@
 import prisma from "../prisma/index.js";
 import cookieToken from "../utils/cookiesToken.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 //* User Sign Up
 export const signUp = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
     // * Check
-    if ((!name, !email, !password)) {
+    if ((!email, !password)) {
       throw new Error("please provide all fields");
     }
 
@@ -18,23 +21,23 @@ export const signUp = async (req, res) => {
     });
 
     if (userCheck) {
-      throw new Error("User Already exist");
+      // throw new Error("User Already Exist");
+      return res.status(400).json({ message: "User Already Exist" });
     } else {
       const hashedPassword = await bcrypt.hash(password, 12);
 
       const user = await prisma.user.create({
         data: {
-          name,
           email,
           password: hashedPassword,
         },
       });
-
-      cookieToken(user, res);
+      const token = jwt.sign({ email }, JWT_SECRET);
+      res.status(201).json({ user, token });
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ error });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -57,8 +60,11 @@ export const login = async (req, res) => {
       throw new Error("No user found with this email");
     }
     const checkPassword = await bcrypt.compare(password, user.password);
+
     if (checkPassword) {
-      cookieToken(user, res);
+      delete user.password;
+      const token = jwt.sign({ user }, JWT_SECRET);
+      res.status(201).json({ user, token });
     } else {
       throw new Error("Credentials not matched");
     }

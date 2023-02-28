@@ -1,13 +1,15 @@
 import prisma from "../prisma/index.js";
 import { ObjectId } from "bson";
+import { requestfailure, requestSuccess } from "../helpers/errorHandler.js";
 
 //* Get All Posts
 export const getPosts = async (req, res) => {
   try {
-    const allPosts = await prisma.post.findMany();
-    return res.status(200).json({ allPosts });
-  } catch {
-    return res.status(404).json({ error: "Not Found" });
+    const allPosts = await prisma.trip.findMany();
+    return requestSuccess(res, 200, allPosts, "Got Successfully");
+  } catch (error) {
+    return requestfailure(res, 404, error, "Request Filed");
+    // return res.status(404).json({ error: "Not Found" });
   }
 };
 
@@ -21,7 +23,7 @@ export const getPost = async (req, res) => {
       },
     });
     return res.status(200).json({ postData });
-  } catch {
+  } catch (error) {
     return res.status(404).json({ error: "Not Found" });
   }
 };
