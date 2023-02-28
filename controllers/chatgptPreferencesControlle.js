@@ -1,14 +1,17 @@
 import prisma from "../prisma/index.js";
-import { requestfailure, requestSuccess } from "../helpers/errorHandler.js";
 import axios from "axios";
 
 //* Get Prefered List
 export const getChatgptPreferences = async (req, res) => {
-  const params = req.query;
-  console.log(params, "params");
+  const params = req.body;
+  console.log(params.cities, "params");
   try {
-    const prompt = `Create list o places to visit in ${params.city1},${params.city2} and ${params.city3} for 14 days. Add to list my preferences to visit Tempels, parks and gaming shops. Add day wise schedule `;
+    const prompt = `Create list o places to visit in ${params.cities.join(
+      ", "
+    )} for 14 days. Add to list my preferences to visit Tempels, parks and gaming shops. Add day wise schedule `;
     const maxTokens = 2048;
+
+    console.log(prompt, "prompptt");
     const model = "text-davinci-003";
     const temperature = 0.5;
     const apiUrl = "https://api.openai.com/v1/completions";
