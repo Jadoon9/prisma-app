@@ -32,7 +32,7 @@ export const signUp = async (req, res) => {
           password: hashedPassword,
         },
       });
-      const token = jwt.sign({ email }, JWT_SECRET);
+      const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });
       res.status(201).json({ user, token });
     }
   } catch (error) {
@@ -63,7 +63,7 @@ export const login = async (req, res) => {
 
     if (checkPassword) {
       delete user.password;
-      const token = jwt.sign({ user }, JWT_SECRET);
+      const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });
       res.status(201).json({ user, token });
     } else {
       throw new Error("Credentials not matched");
