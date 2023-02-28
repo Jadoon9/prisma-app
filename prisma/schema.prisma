@@ -18,7 +18,7 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   isActive    Boolean?  @default(false)
-  Trip        Trip[]
+  trip        Trip[]
   friends     Friend[]
   savedPlaces Place[]
   reviews     Review[]
@@ -33,7 +33,7 @@ model Friend {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   isActive  Boolean?  @default(false)
-  User      User?     @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
   userId    String?
 
   @@index([name])
@@ -45,7 +45,7 @@ model Trip {
   startDate   DateTime  @default(now())
   endDate     DateTime
   duration    Int
-  preferences String
+  preferences String[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   isActive    Boolean?  @default(false)
@@ -55,7 +55,7 @@ model Trip {
   @@index([preferences])
 }
 
-model ChatGpt {
+model Chatgpt {
   id        String    @id @default(uuid())
   choices   String[]
   createdAt DateTime
@@ -64,26 +64,38 @@ model ChatGpt {
 }
 
 model Place {
+  id        String     @id @default(uuid())
+  name      String
+  location  Location[]
+  website   String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime?  @updatedAt
+  isActive  Boolean?   @default(false)
+  Trip      Trip?      @relation(fields: [tripId], references: [id])
+  tripId    String?
+  reviews   Review[]
+  user      User?      @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@index([name])
+}
+
+model Location {
   id        String    @id @default(uuid())
   name      String
-  location  String
   ratings   Float
   latitude  Float
   longitude Float
   openTime  DateTime
   closeTime DateTime
   isOpen    Boolean   @default(false)
-  website   String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   isActive  Boolean?  @default(false)
-  Trip      Trip?     @relation(fields: [tripId], references: [id])
-  tripId    String?
-  reviews   Review[]
-  User      User?     @relation(fields: [userId], references: [id])
-  userId    String?
+  Place     Place?    @relation(fields: [placeId], references: [id])
+  placeId   String?
 
-  @@index([name, location])
+  @@index([name])
 }
 
 model Review {
@@ -96,9 +108,9 @@ model Review {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime? @updatedAt
   isActive      Boolean?  @default(false)
-  Place         Place?    @relation(fields: [placeId], references: [id])
+  place         Place?    @relation(fields: [placeId], references: [id])
   placeId       String?
-  User          User?     @relation(fields: [userId], references: [id])
+  user          User?     @relation(fields: [userId], references: [id])
   userId        String?
 
   @@index([name])
