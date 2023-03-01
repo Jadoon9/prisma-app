@@ -58,6 +58,12 @@ export const login = async (req, res) => {
       where: {
         email,
       },
+      include: {
+        trip: true,
+        reviews: true,
+        friends: true,
+        savedPlaces: true,
+      },
     });
 
     if (!user) {

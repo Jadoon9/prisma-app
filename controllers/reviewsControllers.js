@@ -10,7 +10,7 @@ export const getAllReviews = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-//* Get Reviews byt user
+//* Get Reviews by user
 export const getReviewsByUser = async (req, res) => {
   const { id } = req.params;
   try {
