@@ -1,6 +1,7 @@
 import prisma from "../prisma/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { getJWTToken } from "../helpers/getJwtToken.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -36,7 +37,8 @@ export const signUp = async (req, res) => {
           },
         },
       });
-      const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });
+      const token = getJWTToken(user.id);
+      // const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });
       res.status(201).json({ user, token });
     }
   } catch (error) {
@@ -73,7 +75,8 @@ export const login = async (req, res) => {
 
     if (checkPassword) {
       delete user.password;
-      const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });
+      const token = getJWTToken(user.id);
+      // const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });
       res.status(201).json({ user, token });
     } else {
       throw new Error("Credentials not matched");

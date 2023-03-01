@@ -14,12 +14,12 @@ model User {
   id        String    @id @default(uuid())
   email     String    @unique
   password  String
-  profile   Profile?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   isActive  Boolean?  @default(false)
 
   //*  Relation Fields
+  profile     Profile?
   trip        Trip[]
   friends     Friend[]
   savedPlaces Place[]
