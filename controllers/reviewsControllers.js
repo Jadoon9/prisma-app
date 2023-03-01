@@ -58,21 +58,25 @@ export const updateReview = async (req, res) => {
   const { id } = req.params;
   const { reviewId, ratings, comment } = req.body;
   try {
-    const user = await prisma.review.update({
+    const reviewData = await prisma.review.findFirst({
       where: {
         id: reviewId,
-        userId: id,
-      },
-      data: {
-        reviews: {
-          create: {
-            ratings,
-            comment,
-          },
-        },
       },
     });
-    return res.status(201).json({ data: user });
+
+    if (reviewData.userId !== id) {
+      throw new Error("User is not authorized to update this review");
+    }
+
+    // Update the review with the new data
+    const updatedReview = await prisma.review.update({
+      where: { id: reviewId },
+      data: {
+        ratings,
+        comment,
+      },
+    });
+    return res.status(201).json({ data: updatedReview });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -81,15 +85,24 @@ export const updateReview = async (req, res) => {
 
 //* Delete Review
 export const deleteReview = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
+  const { reviewId } = req.body;
   try {
-    const user = await prisma.user.delete({
+    const reviewData = await prisma.review.findFirst({
       where: {
-        userId: id,
+        id: reviewId,
       },
     });
-    console.log(user, "userrr");
-    return res.status(201).json({ data: user });
+
+    if (reviewData.userId !== id) {
+      throw new Error("User is not authorized to delete this review");
+    }
+
+    // Update the review with the new data
+    await prisma.review.delete({
+      where: { id: reviewId },
+    });
+    return res.status(201).json({ message: "Successfully Deleted" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
