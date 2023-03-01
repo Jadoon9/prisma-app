@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 //* User Sign Up
 export const signUp = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
     // * Check
     if ((!email, !password)) {
       throw new Error("please provide all fields");
@@ -29,6 +29,11 @@ export const signUp = async (req, res) => {
         data: {
           email,
           password: hashedPassword,
+          profile: {
+            create: {
+              name: name,
+            },
+          },
         },
       });
       const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: "1d" });

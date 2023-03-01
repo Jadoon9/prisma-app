@@ -11,20 +11,10 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  profile   Profile?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  isActive  Boolean?  @default(false)
-
-  @@index([email])
-}
-
-model Profile {
   id          String    @id @default(uuid())
-  name        String?
+  email       String    @unique
+  password    String
+  profile     Profile?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   isActive    Boolean?  @default(false)
@@ -32,8 +22,18 @@ model Profile {
   friends     Friend[]
   savedPlaces Place[]
   reviews     Review[]
-  user        User?     @relation(fields: [userId], references: [id])
-  userId      String    @unique
+
+  @@index([email])
+}
+
+model Profile {
+  id        String    @id @default(uuid())
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  isActive  Boolean?  @default(false)
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String    @unique
 }
 
 model Friend {
@@ -43,9 +43,8 @@ model Friend {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   isActive  Boolean?  @default(false)
-
-  profile   Profile? @relation(fields: [profileId], references: [id])
-  profileId String?
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@index([name])
 }
@@ -61,16 +60,16 @@ model Trip {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
   isActive    Boolean?  @default(false)
-  traveler    Profile?  @relation(fields: [travelerId], references: [id])
-  travelerId  String?
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
 
   @@index([preferences])
 }
 
-model Chatgpt {
+model Preferences {
   id        String    @id @default(uuid())
-  choices   String[]
-  createdAt DateTime
+  data      String
+  createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   isActive  Boolean?  @default(false)
 }
@@ -82,12 +81,10 @@ model Place {
   createdAt DateTime   @default(now())
   updatedAt DateTime?  @updatedAt
   isActive  Boolean?   @default(false)
-  Trip      Trip?      @relation(fields: [tripId], references: [id])
+  trip      Trip?      @relation(fields: [tripId], references: [id])
   tripId    String?
-  reviews   Review[]
-
-  traveler   Profile? @relation(fields: [travelerId], references: [id])
-  travelerId String?
+  user      User?      @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@index([name])
 }
@@ -106,29 +103,26 @@ model Location {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   isActive  Boolean?  @default(false)
-  Place     Place?    @relation(fields: [placeId], references: [id])
+  place     Place?    @relation(fields: [placeId], references: [id])
   placeId   String?
+  reviews   Review[]
 
   @@index([name])
 }
 
 model Review {
   id            String    @id @default(uuid())
-  reviewerImage String
-  name          String
+  reviewerImage String?
   ratings       Float?
-  comment       String
+  comment       String?
   images        Image[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime? @updatedAt
   isActive      Boolean?  @default(false)
-  place         Place?    @relation(fields: [placeId], references: [id])
-  placeId       String?
-
-  traveler   Profile? @relation(fields: [travelerId], references: [id])
-  travelerId String?
-
-  @@index([name])
+  location      Location? @relation(fields: [locationId], references: [id])
+  locationId    String?
+  user          User?     @relation(fields: [userId], references: [id])
+  userId        String?
 }
 
 model Image {
@@ -140,6 +134,6 @@ model Image {
   updatedAt  DateTime  @updatedAt
   review     Review?   @relation(fields: [reviewId], references: [id])
   reviewId   String?
-  Location   Location? @relation(fields: [locationId], references: [id])
+  location   Location? @relation(fields: [locationId], references: [id])
   locationId String?
 }
